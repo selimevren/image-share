@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "500718974762",
+    "project_id": "imgshare-b649a",
+    "storage_bucket": "imgshare-b649a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500718974762:android:3b9f67a356f470b07c9053",
+        "android_client_info": {
+          "package_name": "com.stjerneklart.imgshare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRzY5wKwlUq59zuh9OmcSOOKhMRxyZZ7w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

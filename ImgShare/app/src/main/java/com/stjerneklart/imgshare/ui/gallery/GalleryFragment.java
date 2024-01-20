@@ -1,0 +1,88 @@
+package com.stjerneklart.imgshare.ui.gallery;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.stjerneklart.imgshare.databinding.FragmentGalleryBinding;
+import com.stjerneklart.imgshare.ui.adapter.MyAdapter;
+
+import java.util.ArrayList;
+
+public class GalleryFragment extends Fragment {
+
+    private FragmentGalleryBinding binding;
+
+    private FirebaseFirestore firestore;
+    private MyAdapter adapter;
+
+
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        GalleryViewModel galleryViewModel =
+                new ViewModelProvider(this).get(GalleryViewModel.class);
+
+        binding = FragmentGalleryBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+
+
+        firestore = FirebaseFirestore.getInstance();
+        getdataFromFirebase();
+
+        adapter = new MyAdapter(requireContext() , new ArrayList<>());
+        binding.recyclerView.setAdapter(adapter);
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        return root;
+    }
+
+    private void getdataFromFirebase() {
+        CollectionReference postCollection = firestore.collection("posts");
+
+        postCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    ArrayList<String> dataList = new ArrayList<>();
+
+                    for (DocumentSnapshot document : task.getResult()){
+                        String imageUrl = document.getString("imageUrl");
+                        String name = document.getString("name");
+                        ArrayList<String> labelList = (ArrayList<String>) document.get("label");
+
+                        String data = "Image Url : " + (imageUrl !=null ? imageUrl: "") +
+                            "\nLabels : " + (labelList !=null ? labelList.toString(): "") +
+                            "\nName : "   + ( name != null ? name : "" );
+
+                        dataList.add(data );
+                    }
+
+                    adapter.setData(dataList);
+                }
+                else {
+                    Toast.makeText(requireContext() , "veriler alınmadı" + task.getException().getMessage(),Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+}
